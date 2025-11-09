@@ -2,8 +2,12 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USDT DCA Calculator</title>
+    <!-- Meta tags for fullscreen support on iPhone -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DCA Calc">
+    <title>DCA Calculator</title>
     <style>
         /* --- CSS สำหรับตกแต่ง --- */
         :root {
@@ -29,6 +33,7 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
+            overflow: hidden; 
         }
 
         .container {
@@ -38,12 +43,25 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             width: 100%;
             max-width: 500px;
+            overflow-y: auto;
+            max-height: 100vh;
+            box-sizing: border-box;
         }
 
-        h1 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 25px;
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .input-row .input-group {
+            flex: 1;
+        }
+
+        @media (max-width: 400px) {
+            .input-row {
+                flex-direction: column;
+                gap: 15px;
+            }
         }
 
         .input-group {
@@ -118,16 +136,18 @@
             background-color: #b36b00;
         }
 
+        /* --- ส่วนที่แก้ไขสำหรับจัดหัวข้อประวัติ --- */
         .history-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
 
         .history-header h3 {
             margin: 0;
+            margin-right: 10px; /* เพิ่มระยะห่างระหว่างข้อความและปุ่ม */
         }
+        /* --- จบส่วนที่แก้ไข --- */
 
         .btn-clear-small {
             background-color: var(--danger-color);
@@ -143,6 +163,7 @@
             height: 250px;
             overflow-y: auto;
             background-color: var(--input-bg);
+            touch-action: pan-y; 
         }
 
         .history-item-container {
@@ -163,7 +184,7 @@
             border-radius: 4px;
         }
 
-        .history-item-container.dragging {
+        .history-item-container.dragging, .history-item-container.touch-dragging {
             opacity: 0.5;
         }
 
@@ -210,20 +231,37 @@
             font-size: 24px;
             font-weight: bold;
         }
+
+        /* สำหรับ Ghost Element ตอน Drag บนมือถือ */
+        #drag-ghost {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            pointer-events: none;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>USDT DCA Calculator</h1>
-
-        <div class="input-group">
-            <label for="usdt">จำนวน USDT ที่ซื้อ</label>
-            <input type="number" id="usdt" placeholder="0.00" step="0.01">
-        </div>
-        <div class="input-group">
-            <label for="coins">จำนวนเหรียญที่ซื้อ</label>
-            <input type="number" id="coins" placeholder="0.00000000" step="0.00000001">
+        <div class="input-row">
+            <div class="input-group">
+                <label for="usdt">จำนวน USDT ที่ซื้อ</label>
+                <input type="number" id="usdt" placeholder="0.00" step="0.01">
+            </div>
+            <div class="input-group">
+                <label for="coins">จำนวนเหรียญที่ซื้อ</label>
+                <input type="number" id="coins" placeholder="0.00000000" step="0.00000001">
+            </div>
         </div>
 
         <div class="button-group">
@@ -271,9 +309,9 @@
 
         function saveState() {
             past.push(JSON.parse(JSON.stringify(purchases)));
-            future = []; // Clear future on new action
+            future = [];
             if (past.length > HISTORY_LIMIT) {
-                past.shift(); // Remove oldest state
+                past.shift();
             }
         }
 
@@ -284,7 +322,7 @@
                 purchases = past.pop();
                 clearSelection();
                 render();
-                saveData(); // Save the undone state to localStorage
+                saveData();
             }
         }
 
@@ -295,7 +333,7 @@
                 purchases = future.pop();
                 clearSelection();
                 render();
-                saveData(); // Save the redone state to localStorage
+                saveData();
             }
         }
 
@@ -347,6 +385,7 @@
                     container.appendChild(textDiv);
                     container.appendChild(deleteBtn);
 
+                    // Mouse Events
                     container.addEventListener('click', (e) => handleItemClick(e, index));
                     container.addEventListener('dragstart', (e) => handleDragStart(e, index));
                     container.addEventListener('dragover', handleDragOver);
@@ -354,6 +393,12 @@
                     container.addEventListener('dragend', handleDragEnd);
                     container.addEventListener('dragenter', handleDragEnter);
                     container.addEventListener('dragleave', handleDragLeave);
+
+                    // Touch Events
+                    container.addEventListener('touchstart', (e) => handleTouchStart(e, index), {passive: false});
+                    container.addEventListener('touchmove', (e) => handleTouchMove(e), {passive: false});
+                    container.addEventListener('touchend', (e) => handleTouchEnd(e), {passive: false});
+
 
                     historyList.appendChild(container);
                 });
@@ -387,7 +432,7 @@
                 return;
             }
 
-            saveState(); // Save state before action
+            saveState();
             const price = usdt / coins;
             purchases.push({ usdt, coins, price });
             saveData();
@@ -399,7 +444,7 @@
         }
 
         function deletePurchase(indexToDelete) {
-            saveState(); // Save state before action
+            saveState();
             purchases.splice(indexToDelete, 1);
             const newSelectedIndices = new Set();
             selectedIndices.forEach(i => {
@@ -412,7 +457,7 @@
         }
 
         function deleteSelected() {
-            saveState(); // Save state before action
+            saveState();
             const indicesToDelete = Array.from(selectedIndices).sort((a, b) => b - a);
             indicesToDelete.forEach(index => {
                 purchases.splice(index, 1);
@@ -423,7 +468,7 @@
         }
 
         function clearAllData() {
-            saveState(); // Save state before action
+            saveState();
             purchases = [];
             clearSelection();
             localStorage.removeItem('cryptoPurchases');
@@ -457,7 +502,7 @@
             lastSelectedIndex = -1;
         }
 
-        // --- Drag & Drop Logic ---
+        // --- Drag & Drop Logic (Mouse) ---
         function handleDragStart(e, index) {
             draggedIndex = index;
             e.target.classList.add('dragging');
@@ -469,30 +514,98 @@
             }
         }
 
-        function handleDragOver(e) {
-            e.preventDefault();
-        }
-
-        function handleDragEnter(e) {
-            if (e.target.classList.contains('history-item-container')) {
-                e.target.classList.add('drag-over');
-            }
-        }
-
-        function handleDragLeave(e) {
-            if (e.target.classList.contains('history-item-container')) {
-                e.target.classList.remove('drag-over');
-            }
-        }
+        function handleDragOver(e) { e.preventDefault(); }
+        function handleDragEnter(e) { if (e.target.classList.contains('history-item-container')) e.target.classList.add('drag-over'); }
+        function handleDragLeave(e) { if (e.target.classList.contains('history-item-container')) e.target.classList.remove('drag-over'); }
 
         function handleDrop(e, dropIndex) {
             e.preventDefault();
             e.target.classList.remove('drag-over');
-            
             if (draggedIndex === null) return;
+            performReorder(dropIndex);
+        }
 
-            saveState(); // Save state before action
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+            draggedIndex = null;
+        }
 
+        // --- Touch Drag & Drop Logic ---
+        let touchItem = null;
+        let touchOffset = {x: 0, y: 0};
+        let ghostElement = null;
+
+        function handleTouchStart(e, index) {
+            touchItem = e.target.closest('.history-item-container');
+            const touch = e.touches[0];
+            const rect = touchItem.getBoundingClientRect();
+            touchOffset.y = touch.clientY - rect.top;
+
+            if (!selectedIndices.has(index)) {
+                clearSelection();
+                selectedIndices.add(index);
+                lastSelectedIndex = index;
+                render();
+                touchItem = document.querySelector(`.history-item-container[data-index="${index}"]`);
+            }
+            
+            touchItem.classList.add('touch-dragging');
+            
+            ghostElement = touchItem.cloneNode(true);
+            ghostElement.id = 'drag-ghost';
+            ghostElement.style.width = `${rect.width}px`;
+            document.body.appendChild(ghostElement);
+            
+            const moveGhost = (e) => {
+                const touch = e.touches[0];
+                ghostElement.style.left = `${touch.clientX - rect.width / 2}px`;
+                ghostElement.style.top = `${touch.clientY - touchOffset.y}px`;
+            };
+            moveGhost(e);
+        }
+
+        function handleTouchMove(e) {
+            if (!touchItem) return;
+            e.preventDefault();
+            
+            const touch = e.touches[0];
+            ghostElement.style.left = `${touch.clientX - ghostElement.offsetWidth / 2}px`;
+            ghostElement.style.top = `${touch.clientY - touchOffset.y}px`;
+
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const droppableBelow = elementBelow?.closest('.history-item-container');
+            
+            if (droppableBelow && !droppableBelow.classList.contains('touch-dragging')) {
+                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+                droppableBelow.classList.add('drag-over');
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (!touchItem) return;
+
+            const touch = e.changedTouches[0];
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const droppableBelow = elementBelow?.closest('.history-item-container');
+            
+            if (droppableBelow) {
+                const dropIndex = parseInt(droppableBelow.dataset.index);
+                performReorder(dropIndex);
+            }
+
+            if (ghostElement) {
+                ghostElement.remove();
+                ghostElement = null;
+            }
+            touchItem.classList.remove('touch-dragging');
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+            touchItem = null;
+        }
+
+        // --- Reordering Logic ---
+        function performReorder(dropIndex) {
+            saveState();
             const indicesToMove = Array.from(selectedIndices).sort((a, b) => a - b);
             const itemsToMove = indicesToMove.map(i => purchases[i]);
             const remainingItems = purchases.filter((_, i) => !selectedIndices.has(i));
@@ -511,18 +624,10 @@
             saveData();
             render();
         }
-
-        function handleDragEnd(e) {
-            e.target.classList.remove('dragging');
-            document.querySelectorAll('.drag-over').forEach(el => {
-                el.classList.remove('drag-over');
-            });
-            draggedIndex = null;
-        }
         
         // --- Initial Load ---
         window.onload = () => {
-            saveState(); // Save the initial loaded state
+            saveState();
             render();
         };
     </script>
