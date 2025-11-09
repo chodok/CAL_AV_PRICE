@@ -57,12 +57,7 @@
             flex: 1;
         }
 
-        @media (max-width: 400px) {
-            .input-row {
-                flex-direction: column;
-                gap: 15px;
-            }
-        }
+        /* ลบ Media Query ที่ทำให้ช่องกรอกอยู่คนละบรรทัดบนมือถือ */
 
         .input-group {
             margin-bottom: 15px;
@@ -136,7 +131,21 @@
             background-color: #b36b00;
         }
 
-        /* --- ส่วนที่แก้ไขสำหรับจัดหัวข้อประวัติ --- */
+        /* --- ส่วนที่เพิ่มสำหรับปุ่ม Undo/Redo --- */
+        .undo-redo-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .undo-redo-container button {
+            flex: 1;
+            background-color: #555;
+        }
+        .undo-redo-container button:hover:not(:disabled) {
+            background-color: #666;
+        }
+        /* --- จบส่วนที่เพิ่ม --- */
+
         .history-header {
             display: flex;
             align-items: center;
@@ -145,9 +154,8 @@
 
         .history-header h3 {
             margin: 0;
-            margin-right: 10px; /* เพิ่มระยะห่างระหว่างข้อความและปุ่ม */
+            margin-right: 10px;
         }
-        /* --- จบส่วนที่แก้ไข --- */
 
         .btn-clear-small {
             background-color: var(--danger-color);
@@ -268,6 +276,12 @@
             <button class="btn-add" onclick="addPurchase()">เพิ่มรายการ +</button>
         </div>
 
+        <!-- เพิ่มปุ่ม Undo/Redo -->
+        <div class="undo-redo-container">
+            <button id="undo-btn" onclick="undo()" disabled>↶ Undo</button>
+            <button id="redo-btn" onclick="redo()" disabled>↷ Redo</button>
+        </div>
+
         <div class="history-header">
             <h3>ประวัติการซื้อ</h3>
             <button class="btn-clear-small" onclick="clearAllData()">ลบทั้งหมด</button>
@@ -296,6 +310,8 @@
         const totalCoinsSpan = document.getElementById('total-coins');
         const averagePriceSpan = document.getElementById('average-price');
         const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
 
         let purchases = JSON.parse(localStorage.getItem('cryptoPurchases')) || [];
         let selectedIndices = new Set();
@@ -313,6 +329,7 @@
             if (past.length > HISTORY_LIMIT) {
                 past.shift();
             }
+            updateUndoRedoButtons(); // อัปเดตสถานะปุ่มทุกครั้งที่มีการเปลี่ยนแปลง
         }
 
         function undo() {
@@ -335,6 +352,11 @@
                 render();
                 saveData();
             }
+        }
+
+        function updateUndoRedoButtons() {
+            undoBtn.disabled = past.length === 0;
+            redoBtn.disabled = future.length === 0;
         }
 
         window.addEventListener('keydown', (e) => {
@@ -421,6 +443,7 @@
             }
 
             deleteSelectedBtn.style.display = selectedIndices.size > 0 ? 'block' : 'none';
+            updateUndoRedoButtons(); // เรียกเพื่ออัปเดตปุ่ม Undo/Redo ทุกครั้งที่ render
         }
 
         function addPurchase() {
@@ -537,6 +560,11 @@
         let ghostElement = null;
 
         function handleTouchStart(e, index) {
+            // แก้ไข: ถ้า touch ที่ปุ่มลบ ให้จบการทำงานทันที
+            if (e.target.classList.contains('btn-delete-item')) {
+                return;
+            }
+
             touchItem = e.target.closest('.history-item-container');
             const touch = e.touches[0];
             const rect = touchItem.getBoundingClientRect();
