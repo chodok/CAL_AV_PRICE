@@ -57,8 +57,6 @@
             flex: 1;
         }
 
-        /* ลบ Media Query ที่ทำให้ช่องกรอกอยู่คนละบรรทัดบนมือถือ */
-
         .input-group {
             margin-bottom: 15px;
         }
@@ -131,30 +129,24 @@
             background-color: #b36b00;
         }
 
-        /* --- ส่วนที่เพิ่มสำหรับปุ่ม Undo/Redo --- */
-        .undo-redo-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .undo-redo-container button {
-            flex: 1;
-            background-color: #555;
-        }
-        .undo-redo-container button:hover:not(:disabled) {
-            background-color: #666;
-        }
-        /* --- จบส่วนที่เพิ่ม --- */
+        /* ลบส่วนของ .undo-redo-container ออกไป */
 
+        /* --- ส่วนที่แก้ไขสำหรับจัดหัวข้อประวัติและปุ่ม --- */
         .history-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
 
         .history-header h3 {
             margin: 0;
-            margin-right: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 5px; /* ระยะห่างระหว่างปุ่ม */
+            align-items: center;
         }
 
         .btn-clear-small {
@@ -164,6 +156,26 @@
             width: auto;
         }
 
+        .btn-icon {
+            background-color: #555;
+            padding: 8px 10px;
+            font-size: 18px;
+            width: auto;
+            color: white;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s, opacity 0.3s;
+        }
+        .btn-icon:hover:not(:disabled) {
+            background-color: #666;
+        }
+        .btn-icon:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        /* --- จบส่วนที่แก้ไข --- */
+
         .history-container {
             border: 1px solid var(--border-color);
             border-radius: 5px;
@@ -171,7 +183,6 @@
             height: 250px;
             overflow-y: auto;
             background-color: var(--input-bg);
-            touch-action: pan-y; 
         }
 
         .history-item-container {
@@ -229,6 +240,15 @@
             text-align: center;
         }
 
+        .summary-row {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 10px;
+        }
+        .summary-row p {
+            margin: 0;
+        }
+
         .summary p {
             margin: 5px 0;
             font-size: 18px;
@@ -268,7 +288,7 @@
             </div>
             <div class="input-group">
                 <label for="coins">จำนวนเหรียญที่ซื้อ</label>
-                <input type="number" id="coins" placeholder="0.00000000" step="0.00000001">
+                <input type="number" id="coins" placeholder="0.000" step="0.001">
             </div>
         </div>
 
@@ -276,16 +296,16 @@
             <button class="btn-add" onclick="addPurchase()">เพิ่มรายการ +</button>
         </div>
 
-        <!-- เพิ่มปุ่ม Undo/Redo -->
-        <div class="undo-redo-container">
-            <button id="undo-btn" onclick="undo()" disabled>↶ Undo</button>
-            <button id="redo-btn" onclick="redo()" disabled>↷ Redo</button>
-        </div>
-
+        <!-- แก้ไขส่วนนี้ -->
         <div class="history-header">
             <h3>ประวัติการซื้อ</h3>
-            <button class="btn-clear-small" onclick="clearAllData()">ลบทั้งหมด</button>
+            <div class="header-actions">
+                <button class="btn-clear-small" onclick="clearAllData()">ลบทั้งหมด</button>
+                <button id="undo-btn" class="btn-icon" onclick="undo()" disabled>↶</button>
+                <button id="redo-btn" class="btn-icon" onclick="redo()" disabled>↷</button>
+            </div>
         </div>
+
         <div class="history-container" id="history-list">
             <!-- รายการการซื้อจะถูกเพิ่มที่นี่ด้วย JavaScript -->
         </div>
@@ -294,8 +314,10 @@
         </div>
 
         <div class="summary">
-            <p>รวม USDT: <span id="total-usdt">0.00</span></p>
-            <p>รวมเหรียญ: <span id="total-coins">0.00000000</span></p>
+            <div class="summary-row">
+                <p>รวม USDT: <span id="total-usdt">0.00</span></p>
+                <p>รวมเหรียญ: <span id="total-coins">0.000</span></p>
+            </div>
             <p class="average-price">ราคาเฉลี่ย: <span id="average-price">0.0000</span> USDT/Coin</p>
         </div>
     </div>
@@ -329,7 +351,7 @@
             if (past.length > HISTORY_LIMIT) {
                 past.shift();
             }
-            updateUndoRedoButtons(); // อัปเดตสถานะปุ่มทุกครั้งที่มีการเปลี่ยนแปลง
+            updateUndoRedoButtons();
         }
 
         function undo() {
@@ -394,7 +416,7 @@
 
                     const textDiv = document.createElement('div');
                     textDiv.className = 'history-item-text';
-                    textDiv.textContent = `${p.usdt.toFixed(2)} USDT ซื้อได้ ${p.coins.toFixed(8)} Coins @ ${p.price.toFixed(4)} USDT/Coin`;
+                    textDiv.textContent = `${p.usdt.toFixed(2)} USDT ซื้อได้ ${p.coins.toFixed(3)} Coins @ ${p.price.toFixed(4)} USDT/Coin`;
                     
                     const deleteBtn = document.createElement('button');
                     deleteBtn.className = 'btn-delete-item';
@@ -433,7 +455,7 @@
             }, { totalUsdt: 0, totalCoins: 0 });
 
             totalUsdtSpan.textContent = totals.totalUsdt.toFixed(2);
-            totalCoinsSpan.textContent = totals.totalCoins.toFixed(8);
+            totalCoinsSpan.textContent = totals.totalCoins.toFixed(3);
 
             if (totals.totalCoins > 0) {
                 const avgPrice = totals.totalUsdt / totals.totalCoins;
@@ -443,7 +465,7 @@
             }
 
             deleteSelectedBtn.style.display = selectedIndices.size > 0 ? 'block' : 'none';
-            updateUndoRedoButtons(); // เรียกเพื่ออัปเดตปุ่ม Undo/Redo ทุกครั้งที่ render
+            updateUndoRedoButtons();
         }
 
         function addPurchase() {
@@ -554,17 +576,27 @@
             draggedIndex = null;
         }
 
-        // --- Touch Drag & Drop Logic ---
+        // --- Touch Drag & Drop Logic (Long Press) ---
         let touchItem = null;
         let touchOffset = {x: 0, y: 0};
         let ghostElement = null;
+        let longPressTimer = null;
+        let isDragging = false;
 
         function handleTouchStart(e, index) {
-            // แก้ไข: ถ้า touch ที่ปุ่มลบ ให้จบการทำงานทันที
             if (e.target.classList.contains('btn-delete-item')) {
                 return;
             }
+            
+            longPressTimer = setTimeout(() => {
+                isDragging = true;
+                initiateDrag(e, index);
+            }, 200);
+        }
 
+        function initiateDrag(e, index) {
+            e.preventDefault();
+            
             touchItem = e.target.closest('.history-item-container');
             const touch = e.touches[0];
             const rect = touchItem.getBoundingClientRect();
@@ -594,12 +626,15 @@
         }
 
         function handleTouchMove(e) {
-            if (!touchItem) return;
+            if (!isDragging) {
+                clearTimeout(longPressTimer);
+                return;
+            }
             e.preventDefault();
             
             const touch = e.touches[0];
             ghostElement.style.left = `${touch.clientX - ghostElement.offsetWidth / 2}px`;
-            ghostElement.style.top = `${touch.clientY - touchOffset.y}px`;
+            ghostElement.style.top = `${touch.clientY - touchOffset.y}px}`;
 
             const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
             const droppableBelow = elementBelow?.closest('.history-item-container');
@@ -611,7 +646,11 @@
         }
 
         function handleTouchEnd(e) {
-            if (!touchItem) return;
+            clearTimeout(longPressTimer);
+            
+            if (!isDragging) {
+                return;
+            }
 
             const touch = e.changedTouches[0];
             const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -629,6 +668,7 @@
             touchItem.classList.remove('touch-dragging');
             document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
             touchItem = null;
+            isDragging = false;
         }
 
         // --- Reordering Logic ---
