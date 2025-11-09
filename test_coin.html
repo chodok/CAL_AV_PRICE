@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USDT DCA Calculator</title>
+    <style>
+        /* --- CSS สำหรับตกแต่ง --- */
+        :root {
+            --bg-color: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --primary-color: #4CAF50;
+            --secondary-color: #00bcd4;
+            --danger-color: #f44336;
+            --input-bg: #404040;
+            --border-color: #555;
+            --selected-bg: #3a5a3a;
+            --drag-over-bg: #556b55;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--text-color);
+            font-size: 16px;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .button-group {
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, opacity 0.3s;
+            margin-bottom: 10px;
+        }
+        button:last-child {
+            margin-bottom: 0;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-add {
+            background-color: var(--primary-color);
+        }
+        .btn-add:hover {
+            background-color: #45a049;
+        }
+
+        .btn-clear {
+            background-color: var(--danger-color);
+        }
+        .btn-clear:hover {
+            background-color: #e53935;
+        }
+        
+        .btn-delete-selected {
+            background-color: #d17a00;
+        }
+        .btn-delete-selected:hover {
+            background-color: #b36b00;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .history-header h3 {
+            margin: 0;
+        }
+
+        .btn-clear-small {
+            background-color: var(--danger-color);
+            padding: 8px 12px;
+            font-size: 14px;
+            width: auto;
+        }
+
+        .history-container {
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 10px;
+            height: 250px;
+            overflow-y: auto;
+            background-color: var(--input-bg);
+        }
+
+        .history-item-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            user-select: none;
+        }
+        .history-item-container:last-child {
+            border-bottom: none;
+        }
+        
+        .history-item-container.selected {
+            background-color: var(--selected-bg);
+            border-radius: 4px;
+        }
+
+        .history-item-container.dragging {
+            opacity: 0.5;
+        }
+
+        .history-item-container.drag-over {
+            border-top: 2px solid var(--secondary-color);
+        }
+
+        .history-item-text {
+            font-size: 14px;
+            flex-grow: 1;
+            padding-right: 10px;
+        }
+
+        .btn-delete-item {
+            background-color: transparent;
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+            padding: 4px 8px;
+            font-size: 12px;
+            width: auto;
+            border-radius: 4px;
+            margin: 0;
+        }
+        .btn-delete-item:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--input-bg);
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .summary p {
+            margin: 5px 0;
+            font-size: 18px;
+        }
+
+        .summary .average-price {
+            color: var(--secondary-color);
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>USDT DCA Calculator</h1>
+
+        <div class="input-group">
+            <label for="usdt">จำนวน USDT ที่ซื้อ</label>
+            <input type="number" id="usdt" placeholder="0.00" step="0.01">
+        </div>
+        <div class="input-group">
+            <label for="coins">จำนวนเหรียญที่ซื้อ</label>
+            <input type="number" id="coins" placeholder="0.00000000" step="0.00000001">
+        </div>
+
+        <div class="button-group">
+            <button class="btn-add" onclick="addPurchase()">เพิ่มรายการ +</button>
+        </div>
+
+        <div class="history-header">
+            <h3>ประวัติการซื้อ</h3>
+            <button class="btn-clear-small" onclick="clearAllData()">ลบทั้งหมด</button>
+        </div>
+        <div class="history-container" id="history-list">
+            <!-- รายการการซื้อจะถูกเพิ่มที่นี่ด้วย JavaScript -->
+        </div>
+        <div class="button-group" style="margin-top: 10px;">
+            <button id="delete-selected-btn" class="btn-delete-selected" onclick="deleteSelected()" style="display: none;">ลบที่เลือก</button>
+        </div>
+
+        <div class="summary">
+            <p>รวม USDT: <span id="total-usdt">0.00</span></p>
+            <p>รวมเหรียญ: <span id="total-coins">0.00000000</span></p>
+            <p class="average-price">ราคาเฉลี่ย: <span id="average-price">0.0000</span> USDT/Coin</p>
+        </div>
+    </div>
+
+    <script>
+        // --- JavaScript Logic ---
+
+        const usdtInput = document.getElementById('usdt');
+        const coinsInput = document.getElementById('coins');
+        const historyList = document.getElementById('history-list');
+        const totalUsdtSpan = document.getElementById('total-usdt');
+        const totalCoinsSpan = document.getElementById('total-coins');
+        const averagePriceSpan = document.getElementById('average-price');
+        const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+
+        let purchases = JSON.parse(localStorage.getItem('cryptoPurchases')) || [];
+        let selectedIndices = new Set();
+        let lastSelectedIndex = -1;
+        let draggedIndex = null;
+
+        // --- Undo/Redo Logic ---
+        const HISTORY_LIMIT = 50;
+        let past = [];
+        let future = [];
+
+        function saveState() {
+            past.push(JSON.parse(JSON.stringify(purchases)));
+            future = []; // Clear future on new action
+            if (past.length > HISTORY_LIMIT) {
+                past.shift(); // Remove oldest state
+            }
+        }
+
+        function undo() {
+            if (past.length > 0) {
+                const current = JSON.parse(JSON.stringify(purchases));
+                future.push(current);
+                purchases = past.pop();
+                clearSelection();
+                render();
+                saveData(); // Save the undone state to localStorage
+            }
+        }
+
+        function redo() {
+            if (future.length > 0) {
+                const current = JSON.parse(JSON.stringify(purchases));
+                past.push(current);
+                purchases = future.pop();
+                clearSelection();
+                render();
+                saveData(); // Save the redone state to localStorage
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'z') {
+                    e.preventDefault();
+                    undo();
+                } else if (e.key === 'y') {
+                    e.preventDefault();
+                    redo();
+                }
+            }
+        });
+
+        // --- Core App Logic ---
+
+        function saveData() {
+            localStorage.setItem('cryptoPurchases', JSON.stringify(purchases));
+        }
+
+        function render() {
+            historyList.innerHTML = '';
+            if (purchases.length === 0) {
+                historyList.innerHTML = '<p style="text-align:center; color:#888;">ยังไม่มีรายการ</p>';
+            } else {
+                purchases.forEach((p, index) => {
+                    const container = document.createElement('div');
+                    container.className = 'history-item-container';
+                    container.dataset.index = index;
+                    container.draggable = true;
+
+                    if (selectedIndices.has(index)) {
+                        container.classList.add('selected');
+                    }
+
+                    const textDiv = document.createElement('div');
+                    textDiv.className = 'history-item-text';
+                    textDiv.textContent = `${p.usdt.toFixed(2)} USDT ซื้อได้ ${p.coins.toFixed(8)} Coins @ ${p.price.toFixed(4)} USDT/Coin`;
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-delete-item';
+                    deleteBtn.textContent = 'ลบ';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deletePurchase(index);
+                    };
+
+                    container.appendChild(textDiv);
+                    container.appendChild(deleteBtn);
+
+                    container.addEventListener('click', (e) => handleItemClick(e, index));
+                    container.addEventListener('dragstart', (e) => handleDragStart(e, index));
+                    container.addEventListener('dragover', handleDragOver);
+                    container.addEventListener('drop', (e) => handleDrop(e, index));
+                    container.addEventListener('dragend', handleDragEnd);
+                    container.addEventListener('dragenter', handleDragEnter);
+                    container.addEventListener('dragleave', handleDragLeave);
+
+                    historyList.appendChild(container);
+                });
+            }
+
+            const totals = purchases.reduce((acc, p) => {
+                acc.totalUsdt += p.usdt;
+                acc.totalCoins += p.coins;
+                return acc;
+            }, { totalUsdt: 0, totalCoins: 0 });
+
+            totalUsdtSpan.textContent = totals.totalUsdt.toFixed(2);
+            totalCoinsSpan.textContent = totals.totalCoins.toFixed(8);
+
+            if (totals.totalCoins > 0) {
+                const avgPrice = totals.totalUsdt / totals.totalCoins;
+                averagePriceSpan.textContent = avgPrice.toFixed(4);
+            } else {
+                averagePriceSpan.textContent = '0.0000';
+            }
+
+            deleteSelectedBtn.style.display = selectedIndices.size > 0 ? 'block' : 'none';
+        }
+
+        function addPurchase() {
+            const usdt = parseFloat(usdtInput.value);
+            const coins = parseFloat(coinsInput.value);
+
+            if (isNaN(usdt) || usdt <= 0 || isNaN(coins) || coins <= 0) {
+                alert('กรุณาใส่จำนวน USDT และจำนวนเหรียญให้ถูกต้อง');
+                return;
+            }
+
+            saveState(); // Save state before action
+            const price = usdt / coins;
+            purchases.push({ usdt, coins, price });
+            saveData();
+
+            usdtInput.value = '';
+            coinsInput.value = '';
+            clearSelection();
+            render();
+        }
+
+        function deletePurchase(indexToDelete) {
+            saveState(); // Save state before action
+            purchases.splice(indexToDelete, 1);
+            const newSelectedIndices = new Set();
+            selectedIndices.forEach(i => {
+                if (i < indexToDelete) newSelectedIndices.add(i);
+                if (i > indexToDelete) newSelectedIndices.add(i - 1);
+            });
+            selectedIndices = newSelectedIndices;
+            saveData();
+            render();
+        }
+
+        function deleteSelected() {
+            saveState(); // Save state before action
+            const indicesToDelete = Array.from(selectedIndices).sort((a, b) => b - a);
+            indicesToDelete.forEach(index => {
+                purchases.splice(index, 1);
+            });
+            clearSelection();
+            saveData();
+            render();
+        }
+
+        function clearAllData() {
+            saveState(); // Save state before action
+            purchases = [];
+            clearSelection();
+            localStorage.removeItem('cryptoPurchases');
+            render();
+        }
+
+        // --- Multi-Selection Logic ---
+        function handleItemClick(e, index) {
+            if (e.shiftKey && lastSelectedIndex > -1) {
+                const start = Math.min(lastSelectedIndex, index);
+                const end = Math.max(lastSelectedIndex, index);
+                for (let i = start; i <= end; i++) {
+                    selectedIndices.add(i);
+                }
+            } else if (e.ctrlKey || e.metaKey) {
+                if (selectedIndices.has(index)) {
+                    selectedIndices.delete(index);
+                } else {
+                    selectedIndices.add(index);
+                }
+            } else {
+                clearSelection();
+                selectedIndices.add(index);
+            }
+            lastSelectedIndex = index;
+            render();
+        }
+
+        function clearSelection() {
+            selectedIndices.clear();
+            lastSelectedIndex = -1;
+        }
+
+        // --- Drag & Drop Logic ---
+        function handleDragStart(e, index) {
+            draggedIndex = index;
+            e.target.classList.add('dragging');
+            if (!selectedIndices.has(index)) {
+                clearSelection();
+                selectedIndices.add(index);
+                lastSelectedIndex = index;
+                render();
+            }
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDragEnter(e) {
+            if (e.target.classList.contains('history-item-container')) {
+                e.target.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            if (e.target.classList.contains('history-item-container')) {
+                e.target.classList.remove('drag-over');
+            }
+        }
+
+        function handleDrop(e, dropIndex) {
+            e.preventDefault();
+            e.target.classList.remove('drag-over');
+            
+            if (draggedIndex === null) return;
+
+            saveState(); // Save state before action
+
+            const indicesToMove = Array.from(selectedIndices).sort((a, b) => a - b);
+            const itemsToMove = indicesToMove.map(i => purchases[i]);
+            const remainingItems = purchases.filter((_, i) => !selectedIndices.has(i));
+
+            let insertionIndex = dropIndex;
+            indicesToMove.forEach(i => {
+                if (i < dropIndex) {
+                    insertionIndex--;
+                }
+            });
+
+            remainingItems.splice(insertionIndex, 0, ...itemsToMove);
+            purchases = remainingItems;
+
+            clearSelection();
+            saveData();
+            render();
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.drag-over').forEach(el => {
+                el.classList.remove('drag-over');
+            });
+            draggedIndex = null;
+        }
+        
+        // --- Initial Load ---
+        window.onload = () => {
+            saveState(); // Save the initial loaded state
+            render();
+        };
+    </script>
+</body>
+</html>
