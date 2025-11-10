@@ -2,7 +2,6 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <!-- Meta tags for fullscreen support on iPhone -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,6 +20,8 @@
             --border-color: #555;
             --selected-bg: #3a5a3a;
             --drag-over-bg: #556b55;
+            --profit-color: #4CAF50;
+            --loss-color: #f44336;
         }
 
         body {
@@ -28,7 +29,7 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 15px; /* ลด padding */
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -38,7 +39,7 @@
 
         .container {
             background-color: var(--container-bg);
-            padding: 25px;
+            padding: 20px; /* ลด padding */
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             width: 100%;
@@ -58,13 +59,14 @@
         }
 
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px; /* ลด margin */
         }
 
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
+            font-size: 14px; /* ลดขนาดตัวอักษร */
         }
 
         input[type="number"] {
@@ -85,12 +87,12 @@
 
         .button-group {
             display: block;
-            margin-bottom: 20px;
+            margin-bottom: 15px; /* ลด margin */
         }
 
         button {
             width: 100%;
-            padding: 12px;
+            padding: 10px; /* ลด padding */
             border: none;
             border-radius: 5px;
             color: white;
@@ -98,7 +100,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s, opacity 0.3s;
-            margin-bottom: 10px;
+            margin-bottom: 8px; /* ลด margin */
         }
         button:last-child {
             margin-bottom: 0;
@@ -129,37 +131,35 @@
             background-color: #b36b00;
         }
 
-        /* ลบส่วนของ .undo-redo-container ออกไป */
-
-        /* --- ส่วนที่แก้ไขสำหรับจัดหัวข้อประวัติและปุ่ม --- */
         .history-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px; /* ลด margin */
         }
 
         .history-header h3 {
             margin: 0;
+            font-size: 16px; /* ลดขนาดตัวอักษร */
         }
 
         .header-actions {
             display: flex;
-            gap: 5px; /* ระยะห่างระหว่างปุ่ม */
+            gap: 5px;
             align-items: center;
         }
 
         .btn-clear-small {
             background-color: var(--danger-color);
-            padding: 8px 12px;
-            font-size: 14px;
+            padding: 6px 10px; /* ลด padding */
+            font-size: 12px; /* ลดขนาดตัวอักษร */
             width: auto;
         }
 
         .btn-icon {
             background-color: #555;
-            padding: 8px 10px;
-            font-size: 18px;
+            padding: 6px 8px; /* ลด padding */
+            font-size: 16px; /* ลดขนาดตัวอักษร */
             width: auto;
             color: white;
             border-radius: 5px;
@@ -174,13 +174,12 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
-        /* --- จบส่วนที่แก้ไข --- */
 
         .history-container {
             border: 1px solid var(--border-color);
             border-radius: 5px;
-            padding: 10px;
-            height: 250px;
+            padding: 8px; /* ลด padding */
+            height: 180px; /* ลดความสูง */
             overflow-y: auto;
             background-color: var(--input-bg);
         }
@@ -189,7 +188,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px;
+            padding: 6px; /* ลด padding */
             border-bottom: 1px solid var(--border-color);
             cursor: pointer;
             user-select: none;
@@ -212,7 +211,7 @@
         }
 
         .history-item-text {
-            font-size: 14px;
+            font-size: 13px; /* ลดขนาดตัวอักษร */
             flex-grow: 1;
             padding-right: 10px;
         }
@@ -221,8 +220,8 @@
             background-color: transparent;
             color: var(--danger-color);
             border: 1px solid var(--danger-color);
-            padding: 4px 8px;
-            font-size: 12px;
+            padding: 3px 6px; /* ลด padding */
+            font-size: 11px; /* ลดขนาดตัวอักษร */
             width: auto;
             border-radius: 4px;
             margin: 0;
@@ -232,9 +231,35 @@
             color: white;
         }
 
+        /* --- ส่วนสำหรับ PnL --- */
+        .pnl-section {
+            margin-bottom: 15px;
+            padding: 12px;
+            background-color: var(--input-bg);
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+        }
+        .pnl-section label {
+            font-size: 14px;
+        }
+        .pnl-display {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .pnl-display p {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .profit { color: var(--profit-color); }
+        .loss { color: var(--loss-color); }
+        /* --- จบส่วน PnL --- */
+
         .summary {
-            margin-top: 20px;
-            padding: 15px;
+            margin-top: 15px; /* ลด margin */
+            padding: 12px; /* ลด padding */
             background-color: var(--input-bg);
             border-radius: 5px;
             text-align: center;
@@ -243,20 +268,21 @@
         .summary-row {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 10px;
+            margin-bottom: 8px; /* ลด margin */
         }
         .summary-row p {
             margin: 0;
+            font-size: 15px; /* ลดขนาดตัวอักษร */
         }
 
         .summary p {
             margin: 5px 0;
-            font-size: 18px;
+            font-size: 16px; /* ลดขนาดตัวอักษร */
         }
 
         .summary .average-price {
             color: var(--secondary-color);
-            font-size: 24px;
+            font-size: 20px; /* ลดขนาดตัวอักษร */
             font-weight: bold;
         }
 
@@ -283,8 +309,8 @@
     <div class="container">
         <div class="input-row">
             <div class="input-group">
-                <label for="usdt">จำนวน USDT ที่ซื้อ</label>
-                <input type="number" id="usdt" placeholder="0.00" step="0.01">
+                <label for="entry-price">Entry Price (USDT)</label>
+                <input type="number" id="entry-price" placeholder="0.0000" step="0.0001">
             </div>
             <div class="input-group">
                 <label for="coins">จำนวนเหรียญที่ซื้อ</label>
@@ -296,7 +322,18 @@
             <button class="btn-add" onclick="addPurchase()">เพิ่มรายการ +</button>
         </div>
 
-        <!-- แก้ไขส่วนนี้ -->
+        <!-- เพิ่มส่วนคำนวณ PnL -->
+        <div class="pnl-section">
+            <div class="input-group">
+                <label for="exit-price">Exit Price (USDT)</label>
+                <input type="number" id="exit-price" placeholder="0.0000" step="0.0001">
+            </div>
+            <div class="pnl-display">
+                <p>PnL: <span id="pnl-usdt">0.00</span> USDT</p>
+                <p>ROI: <span id="roi-percent">0.00</span>%</p>
+            </div>
+        </div>
+
         <div class="history-header">
             <h3>ประวัติการซื้อ</h3>
             <div class="header-actions">
@@ -305,7 +342,6 @@
                 <button id="redo-btn" class="btn-icon" onclick="redo()" disabled>↷</button>
             </div>
         </div>
-
         <div class="history-container" id="history-list">
             <!-- รายการการซื้อจะถูกเพิ่มที่นี่ด้วย JavaScript -->
         </div>
@@ -325,12 +361,15 @@
     <script>
         // --- JavaScript Logic ---
 
-        const usdtInput = document.getElementById('usdt');
+        const entryPriceInput = document.getElementById('entry-price');
         const coinsInput = document.getElementById('coins');
+        const exitPriceInput = document.getElementById('exit-price');
         const historyList = document.getElementById('history-list');
         const totalUsdtSpan = document.getElementById('total-usdt');
         const totalCoinsSpan = document.getElementById('total-coins');
         const averagePriceSpan = document.getElementById('average-price');
+        const pnlUsdtSpan = document.getElementById('pnl-usdt');
+        const roiPercentSpan = document.getElementById('roi-percent');
         const deleteSelectedBtn = document.getElementById('delete-selected-btn');
         const undoBtn = document.getElementById('undo-btn');
         const redoBtn = document.getElementById('redo-btn');
@@ -416,7 +455,8 @@
 
                     const textDiv = document.createElement('div');
                     textDiv.className = 'history-item-text';
-                    textDiv.textContent = `${p.usdt.toFixed(2)} USDT ซื้อได้ ${p.coins.toFixed(3)} Coins @ ${p.price.toFixed(4)} USDT/Coin`;
+                    // แสดงผลใหม่: แสดงจำนวนเงินที่จ่าย และราคาที่ซื้อ
+                    textDiv.textContent = `ซื้อ ${p.coins.toFixed(3)} Coins @ ${p.price.toFixed(4)} (จ่าย ${p.usdt.toFixed(2)} USDT)`;
                     
                     const deleteBtn = document.createElement('button');
                     deleteBtn.className = 'btn-delete-item';
@@ -429,7 +469,6 @@
                     container.appendChild(textDiv);
                     container.appendChild(deleteBtn);
 
-                    // Mouse Events
                     container.addEventListener('click', (e) => handleItemClick(e, index));
                     container.addEventListener('dragstart', (e) => handleDragStart(e, index));
                     container.addEventListener('dragover', handleDragOver);
@@ -438,11 +477,9 @@
                     container.addEventListener('dragenter', handleDragEnter);
                     container.addEventListener('dragleave', handleDragLeave);
 
-                    // Touch Events
                     container.addEventListener('touchstart', (e) => handleTouchStart(e, index), {passive: false});
                     container.addEventListener('touchmove', (e) => handleTouchMove(e), {passive: false});
                     container.addEventListener('touchend', (e) => handleTouchEnd(e), {passive: false});
-
 
                     historyList.appendChild(container);
                 });
@@ -466,23 +503,26 @@
 
             deleteSelectedBtn.style.display = selectedIndices.size > 0 ? 'block' : 'none';
             updateUndoRedoButtons();
+            
+            // คำนวณ PnL ทุกครั้งที่ render
+            calculatePnL();
         }
 
         function addPurchase() {
-            const usdt = parseFloat(usdtInput.value);
+            const entryPrice = parseFloat(entryPriceInput.value);
             const coins = parseFloat(coinsInput.value);
 
-            if (isNaN(usdt) || usdt <= 0 || isNaN(coins) || coins <= 0) {
-                alert('กรุณาใส่จำนวน USDT และจำนวนเหรียญให้ถูกต้อง');
+            if (isNaN(entryPrice) || entryPrice <= 0 || isNaN(coins) || coins <= 0) {
+                alert('กรุณาใส่ Entry Price และจำนวนเหรียญให้ถูกต้อง');
                 return;
             }
 
             saveState();
-            const price = usdt / coins;
-            purchases.push({ usdt, coins, price });
+            const usdtSpent = entryPrice * coins;
+            purchases.push({ usdt: usdtSpent, coins, price: entryPrice });
             saveData();
 
-            usdtInput.value = '';
+            entryPriceInput.value = '';
             coinsInput.value = '';
             clearSelection();
             render();
@@ -518,6 +558,35 @@
             clearSelection();
             localStorage.removeItem('cryptoPurchases');
             render();
+        }
+
+        // --- PnL Calculation Logic ---
+        function calculatePnL() {
+            const exitPrice = parseFloat(exitPriceInput.value);
+            const totals = purchases.reduce((acc, p) => {
+                acc.totalUsdt += p.usdt;
+                acc.totalCoins += p.coins;
+                return acc;
+            }, { totalUsdt: 0, totalCoins: 0 });
+
+            if (isNaN(exitPrice) || exitPrice <= 0 || totals.totalCoins === 0) {
+                pnlUsdtSpan.textContent = '0.00';
+                roiPercentSpan.textContent = '0.00';
+                pnlUsdtSpan.className = '';
+                roiPercentSpan.className = '';
+                return;
+            }
+
+            const avgPrice = totals.totalUsdt / totals.totalCoins;
+            const pnl = (exitPrice - avgPrice) * totals.totalCoins;
+            const roi = ((exitPrice - avgPrice) / avgPrice) * 100;
+
+            pnlUsdtSpan.textContent = pnl.toFixed(2);
+            roiPercentSpan.textContent = roi.toFixed(2);
+
+            const pnlClass = pnl >= 0 ? 'profit' : 'loss';
+            pnlUsdtSpan.className = pnlClass;
+            roiPercentSpan.className = pnlClass;
         }
 
         // --- Multi-Selection Logic ---
@@ -697,6 +766,8 @@
         window.onload = () => {
             saveState();
             render();
+            // เพิ่ม event listener สำหรับช่อง Exit Price
+            exitPriceInput.addEventListener('input', calculatePnL);
         };
     </script>
 </body>
