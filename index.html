@@ -284,10 +284,62 @@
             font-weight: bold;
         }
 
-        /* --- ส่วนที่เพิ่มสำหรับสีตัวอย่างราคาเฉลี่ย --- */
         .summary .average-price.preview {
-            color: #8cc98c; /* สีเขียวอ่อน */
+            color: #8cc98c;
             font-style: italic;
+        }
+
+        /* --- ส่วนที่เพิ่มสำหรับ Settings Modal --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--container-bg);
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.8);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--text-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            padding: 0;
+            width: auto;
+            margin: 0;
+        }
+        .close-btn:hover {
+            color: white;
         }
         /* --- จบส่วนที่เพิ่ม --- */
 
@@ -343,6 +395,7 @@
                 <button class="btn-clear-small" onclick="clearAllData()">ลบทั้งหมด</button>
                 <button id="undo-btn" class="btn-icon" onclick="undo()" disabled>↶</button>
                 <button id="redo-btn" class="btn-icon" onclick="redo()" disabled>↷</button>
+                <button class="btn-icon" onclick="openSettingsModal()">⚙️</button>
             </div>
         </div>
         <div class="history-container" id="history-list">
@@ -358,6 +411,31 @@
                 <p>รวมเหรียญ: <span id="total-coins">0.000</span></p>
             </div>
             <p class="average-price">ราคาเฉลี่ย: <span id="average-price">0.0000</span> USDT/Coin</p>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>ตั้งค่า</h2>
+                <button class="close-btn" onclick="closeSettingsModal()">&times;</button>
+            </div>
+            <div class="input-group">
+                <label for="step-entry">Step สำหรับ Entry Price</label>
+                <input type="number" id="step-entry" step="0.0001" min="0.0001">
+            </div>
+            <div class="input-group">
+                <label for="step-coins">Step สำหรับจำนวนเหรียญ</label>
+                <input type="number" id="step-coins" step="0.001" min="0.001">
+            </div>
+            <div class="input-group">
+                <label for="step-exit">Step สำหรับ Exit Price</label>
+                <input type="number" id="step-exit" step="0.0001" min="0.0001">
+            </div>
+            <div class="button-group">
+                <button class="btn-add" onclick="saveSettings()">บันทึก</button>
+            </div>
         </div>
     </div>
 
@@ -377,10 +455,59 @@
         const undoBtn = document.getElementById('undo-btn');
         const redoBtn = document.getElementById('redo-btn');
 
+        // --- Settings Modal Elements ---
+        const settingsModal = document.getElementById('settings-modal');
+        const stepEntryInput = document.getElementById('step-entry');
+        const stepCoinsInput = document.getElementById('step-coins');
+        const stepExitInput = document.getElementById('step-exit');
+
         let purchases = JSON.parse(localStorage.getItem('cryptoPurchases')) || [];
         let selectedIndices = new Set();
         let lastSelectedIndex = -1;
         let draggedIndex = null;
+
+        // --- Settings Logic ---
+        const DEFAULT_STEPS = { entry: 0.0001, coins: 0.001, exit: 0.0001 };
+        let steps = JSON.parse(localStorage.getItem('calculatorSteps')) || DEFAULT_STEPS;
+
+        function applyStepToInputs() {
+            entryPriceInput.step = steps.entry;
+            coinsInput.step = steps.coins;
+            exitPriceInput.step = steps.exit;
+        }
+
+        function openSettingsModal() {
+            stepEntryInput.value = steps.entry;
+            stepCoinsInput.value = steps.coins;
+            stepExitInput.value = steps.exit;
+            settingsModal.style.display = 'flex';
+        }
+
+        function closeSettingsModal() {
+            settingsModal.style.display = 'none';
+        }
+
+        function saveSettings() {
+            const newStepEntry = parseFloat(stepEntryInput.value);
+            const newStepCoins = parseFloat(stepCoinsInput.value);
+            const newStepExit = parseFloat(stepExitInput.value);
+
+            if (isNaN(newStepEntry) || newStepEntry <= 0 || isNaN(newStepCoins) || newStepCoins <= 0 || isNaN(newStepExit) || newStepExit <= 0) {
+                alert('กรุณาใส่ค่า Step ที่มากกว่า 0 ให้ครบทุกช่อง');
+                return;
+            }
+
+            steps = { entry: newStepEntry, coins: newStepCoins, exit: newStepExit };
+            localStorage.setItem('calculatorSteps', JSON.stringify(steps));
+            applyStepToInputs();
+            closeSettingsModal();
+        }
+        
+        window.onclick = function(event) {
+            if (event.target == settingsModal) {
+                closeSettingsModal();
+            }
+        }
 
         // --- Undo/Redo Logic ---
         const HISTORY_LIMIT = 50;
@@ -441,7 +568,6 @@
             localStorage.setItem('cryptoPurchases', JSON.stringify(purchases));
         }
 
-        // --- ฟังก์ชันใหม่สำหรับคำนวณสรุป ---
         function calculateSummary(potentialEntryPrice = null, potentialCoins = null) {
             const totals = purchases.reduce((acc, p) => {
                 acc.totalUsdt += p.usdt;
@@ -520,7 +646,6 @@
             deleteSelectedBtn.style.display = selectedIndices.size > 0 ? 'block' : 'none';
             updateUndoRedoButtons();
             
-            // เรียก calculateSummary แทนการคำนวณตรงๆ
             calculateSummary();
             calculatePnL();
         }
@@ -542,7 +667,7 @@
             entryPriceInput.value = '';
             coinsInput.value = '';
             clearSelection();
-            render(); // render จะเรียก calculateSummary ใหม่โดยไม่มีค่า preview
+            render();
         }
 
         function deletePurchase(indexToDelete) {
@@ -779,12 +904,38 @@
             render();
         }
         
+        // --- Inertial Scroll Logic ---
+        const scrollStates = new Map();
+
+        function startInertialScroll(input, state) {
+            const animate = () => {
+                if (Math.abs(state.velocity) < 0.01) {
+                    cancelAnimationFrame(state.animationId);
+                    state.animationId = null;
+                    return;
+                }
+                const step = parseFloat(input.step);
+                const change = state.velocity * step * 2; // ปรับความไวให้เหมาะสม
+                const currentValue = parseFloat(input.value) || 0;
+                let newValue = currentValue + change;
+                if (newValue < 0) newValue = 0;
+
+                const decimals = input.step.split('.')[1]?.length || 0;
+                input.value = newValue.toFixed(decimals);
+                input.dispatchEvent(new Event('input'));
+
+                state.velocity *= 0.95; // ค่าแรงเสียดทาน
+                state.animationId = requestAnimationFrame(animate);
+            };
+            state.animationId = requestAnimationFrame(animate);
+        }
+
         // --- Initial Load ---
         window.onload = () => {
+            applyStepToInputs();
             saveState();
             render();
 
-            // Real-time average price calculation
             const handleInputChange = () => {
                 const entryPrice = parseFloat(entryPriceInput.value);
                 const coins = parseFloat(coinsInput.value);
@@ -797,7 +948,61 @@
             entryPriceInput.addEventListener('input', handleInputChange);
             coinsInput.addEventListener('input', handleInputChange);
 
-            // Scroll to change value
+            const numberInputs = [entryPriceInput, coinsInput, exitPriceInput];
+
+            numberInputs.forEach(input => {
+                const state = { lastY: 0, lastTime: 0, velocity: 0, animationId: null };
+                scrollStates.set(input, state);
+
+                const handleTouchStartForInput = (e) => {
+                    // หยุดการเลื่อนแบบ inertial ถ้ามีอยู่
+                    if (state.animationId) {
+                        cancelAnimationFrame(state.animationId);
+                        state.animationId = null;
+                    }
+                    state.velocity = 0;
+                    state.lastY = e.touches[0].clientY;
+                    state.lastTime = e.timeStamp;
+                };
+
+                const handleTouchMoveForInput = (e) => {
+                    e.preventDefault();
+                    const touchY = e.touches[0].clientY;
+                    const deltaY = state.lastY - touchY;
+                    const step = parseFloat(input.step);
+                    const pixelsPerStep = 30;
+                    const stepsToChange = Math.floor(deltaY / pixelsPerStep);
+                    
+                    const currentValue = parseFloat(input.value) || 0;
+                    let newValue = currentValue + (stepsToChange * step);
+                    if (newValue < 0) newValue = 0;
+
+                    const decimals = input.step.split('.')[1]?.length || 0;
+                    input.value = newValue.toFixed(decimals);
+                    input.dispatchEvent(new Event('input'));
+
+                    // คำนวณความเร็ว
+                    const currentTime = e.timeStamp;
+                    const deltaTime = currentTime - state.lastTime;
+                    if (deltaTime > 0) {
+                        state.velocity = deltaY / deltaTime;
+                    }
+                    state.lastY = touchY;
+                    state.lastTime = currentTime;
+                };
+
+                const handleTouchEndForInput = (e) => {
+                    // ถ้าความเร็วสูงพอ ให้เริ่มการเลื่อนแบบ inertial
+                    if (Math.abs(state.velocity) > 0.2) {
+                        startInertialScroll(input, state);
+                    }
+                };
+
+                input.addEventListener('touchstart', handleTouchStartForInput, { passive: false });
+                input.addEventListener('touchmove', handleTouchMoveForInput, { passive: false });
+                input.addEventListener('touchend', handleTouchEndForInput, { passive: false });
+            });
+
             const handleWheel = (e) => {
                 e.preventDefault();
                 const input = e.target;
@@ -805,15 +1010,14 @@
                 const step = parseFloat(input.step);
                 let newValue = currentValue;
 
-                if (e.deltaY < 0) { // Scroll up
+                if (e.deltaY < 0) {
                     newValue += step;
-                } else if (e.deltaY > 0) { // Scroll down
+                } else if (e.deltaY > 0) {
                     newValue -= step;
                 }
                 
                 if (newValue < 0) newValue = 0;
 
-                // Determine decimal places from step attribute
                 const decimals = input.step.split('.')[1]?.length || 0;
                 input.value = newValue.toFixed(decimals);
                 input.dispatchEvent(new Event('input'));
