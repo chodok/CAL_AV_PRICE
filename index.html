@@ -29,7 +29,7 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 15px; /* ลด padding */
+            padding: 15px;
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -39,7 +39,7 @@
 
         .container {
             background-color: var(--container-bg);
-            padding: 20px; /* ลด padding */
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             width: 100%;
@@ -59,14 +59,14 @@
         }
 
         .input-group {
-            margin-bottom: 12px; /* ลด margin */
+            margin-bottom: 12px;
         }
 
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
-            font-size: 14px; /* ลดขนาดตัวอักษร */
+            font-size: 14px;
         }
 
         input[type="number"] {
@@ -87,12 +87,12 @@
 
         .button-group {
             display: block;
-            margin-bottom: 15px; /* ลด margin */
+            margin-bottom: 15px;
         }
 
         button {
             width: 100%;
-            padding: 10px; /* ลด padding */
+            padding: 10px;
             border: none;
             border-radius: 5px;
             color: white;
@@ -100,7 +100,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s, opacity 0.3s;
-            margin-bottom: 8px; /* ลด margin */
+            margin-bottom: 8px;
         }
         button:last-child {
             margin-bottom: 0;
@@ -135,12 +135,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px; /* ลด margin */
+            margin-bottom: 8px;
         }
 
         .history-header h3 {
             margin: 0;
-            font-size: 16px; /* ลดขนาดตัวอักษร */
+            font-size: 16px;
         }
 
         .header-actions {
@@ -151,15 +151,15 @@
 
         .btn-clear-small {
             background-color: var(--danger-color);
-            padding: 6px 10px; /* ลด padding */
-            font-size: 12px; /* ลดขนาดตัวอักษร */
+            padding: 6px 10px;
+            font-size: 12px;
             width: auto;
         }
 
         .btn-icon {
             background-color: #555;
-            padding: 6px 8px; /* ลด padding */
-            font-size: 16px; /* ลดขนาดตัวอักษร */
+            padding: 6px 8px;
+            font-size: 16px;
             width: auto;
             color: white;
             border-radius: 5px;
@@ -178,8 +178,8 @@
         .history-container {
             border: 1px solid var(--border-color);
             border-radius: 5px;
-            padding: 8px; /* ลด padding */
-            height: 180px; /* ลดความสูง */
+            padding: 8px;
+            height: 180px;
             overflow-y: auto;
             background-color: var(--input-bg);
         }
@@ -188,7 +188,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px; /* ลด padding */
+            padding: 6px;
             border-bottom: 1px solid var(--border-color);
             cursor: pointer;
             user-select: none;
@@ -211,7 +211,7 @@
         }
 
         .history-item-text {
-            font-size: 13px; /* ลดขนาดตัวอักษร */
+            font-size: 13px;
             flex-grow: 1;
             padding-right: 10px;
         }
@@ -220,8 +220,8 @@
             background-color: transparent;
             color: var(--danger-color);
             border: 1px solid var(--danger-color);
-            padding: 3px 6px; /* ลด padding */
-            font-size: 11px; /* ลดขนาดตัวอักษร */
+            padding: 3px 6px;
+            font-size: 11px;
             width: auto;
             border-radius: 4px;
             margin: 0;
@@ -231,7 +231,6 @@
             color: white;
         }
 
-        /* --- ส่วนสำหรับ PnL --- */
         .pnl-section {
             margin-bottom: 15px;
             padding: 12px;
@@ -255,11 +254,10 @@
         }
         .profit { color: var(--profit-color); }
         .loss { color: var(--loss-color); }
-        /* --- จบส่วน PnL --- */
 
         .summary {
-            margin-top: 15px; /* ลด margin */
-            padding: 12px; /* ลด padding */
+            margin-top: 15px;
+            padding: 12px;
             background-color: var(--input-bg);
             border-radius: 5px;
             text-align: center;
@@ -268,25 +266,31 @@
         .summary-row {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 8px; /* ลด margin */
+            margin-bottom: 8px;
         }
         .summary-row p {
             margin: 0;
-            font-size: 15px; /* ลดขนาดตัวอักษร */
+            font-size: 15px;
         }
 
         .summary p {
             margin: 5px 0;
-            font-size: 16px; /* ลดขนาดตัวอักษร */
+            font-size: 16px;
         }
 
         .summary .average-price {
             color: var(--secondary-color);
-            font-size: 20px; /* ลดขนาดตัวอักษร */
+            font-size: 20px;
             font-weight: bold;
         }
 
-        /* สำหรับ Ghost Element ตอน Drag บนมือถือ */
+        /* --- ส่วนที่เพิ่มสำหรับสีตัวอย่างราคาเฉลี่ย --- */
+        .summary .average-price.preview {
+            color: #8cc98c; /* สีเขียวอ่อน */
+            font-style: italic;
+        }
+        /* --- จบส่วนที่เพิ่ม --- */
+
         #drag-ghost {
             position: fixed;
             top: 0;
@@ -322,7 +326,6 @@
             <button class="btn-add" onclick="addPurchase()">เพิ่มรายการ +</button>
         </div>
 
-        <!-- เพิ่มส่วนคำนวณ PnL -->
         <div class="pnl-section">
             <div class="input-group">
                 <label for="exit-price">Exit Price (USDT)</label>
@@ -438,6 +441,36 @@
             localStorage.setItem('cryptoPurchases', JSON.stringify(purchases));
         }
 
+        // --- ฟังก์ชันใหม่สำหรับคำนวณสรุป ---
+        function calculateSummary(potentialEntryPrice = null, potentialCoins = null) {
+            const totals = purchases.reduce((acc, p) => {
+                acc.totalUsdt += p.usdt;
+                acc.totalCoins += p.coins;
+                return acc;
+            }, { totalUsdt: 0, totalCoins: 0 });
+
+            if (potentialEntryPrice !== null && potentialCoins !== null && potentialEntryPrice > 0 && potentialCoins > 0) {
+                totals.totalUsdt += potentialEntryPrice * potentialCoins;
+                totals.totalCoins += potentialCoins;
+            }
+
+            totalUsdtSpan.textContent = totals.totalUsdt.toFixed(2);
+            totalCoinsSpan.textContent = totals.totalCoins.toFixed(3);
+
+            if (totals.totalCoins > 0) {
+                const avgPrice = totals.totalUsdt / totals.totalCoins;
+                averagePriceSpan.textContent = avgPrice.toFixed(4);
+                if (potentialEntryPrice !== null && potentialCoins !== null) {
+                    averagePriceSpan.classList.add('preview');
+                } else {
+                    averagePriceSpan.classList.remove('preview');
+                }
+            } else {
+                averagePriceSpan.textContent = '0.0000';
+                averagePriceSpan.classList.remove('preview');
+            }
+        }
+
         function render() {
             historyList.innerHTML = '';
             if (purchases.length === 0) {
@@ -455,7 +488,6 @@
 
                     const textDiv = document.createElement('div');
                     textDiv.className = 'history-item-text';
-                    // แสดงผลใหม่: แสดงจำนวนเงินที่จ่าย และราคาที่ซื้อ
                     textDiv.textContent = `ซื้อ ${p.coins.toFixed(3)} Coins @ ${p.price.toFixed(4)} (จ่าย ${p.usdt.toFixed(2)} USDT)`;
                     
                     const deleteBtn = document.createElement('button');
@@ -485,26 +517,11 @@
                 });
             }
 
-            const totals = purchases.reduce((acc, p) => {
-                acc.totalUsdt += p.usdt;
-                acc.totalCoins += p.coins;
-                return acc;
-            }, { totalUsdt: 0, totalCoins: 0 });
-
-            totalUsdtSpan.textContent = totals.totalUsdt.toFixed(2);
-            totalCoinsSpan.textContent = totals.totalCoins.toFixed(3);
-
-            if (totals.totalCoins > 0) {
-                const avgPrice = totals.totalUsdt / totals.totalCoins;
-                averagePriceSpan.textContent = avgPrice.toFixed(4);
-            } else {
-                averagePriceSpan.textContent = '0.0000';
-            }
-
             deleteSelectedBtn.style.display = selectedIndices.size > 0 ? 'block' : 'none';
             updateUndoRedoButtons();
             
-            // คำนวณ PnL ทุกครั้งที่ render
+            // เรียก calculateSummary แทนการคำนวณตรงๆ
+            calculateSummary();
             calculatePnL();
         }
 
@@ -525,7 +542,7 @@
             entryPriceInput.value = '';
             coinsInput.value = '';
             clearSelection();
-            render();
+            render(); // render จะเรียก calculateSummary ใหม่โดยไม่มีค่า preview
         }
 
         function deletePurchase(indexToDelete) {
@@ -766,7 +783,46 @@
         window.onload = () => {
             saveState();
             render();
-            // เพิ่ม event listener สำหรับช่อง Exit Price
+
+            // Real-time average price calculation
+            const handleInputChange = () => {
+                const entryPrice = parseFloat(entryPriceInput.value);
+                const coins = parseFloat(coinsInput.value);
+                if (!isNaN(entryPrice) && entryPrice > 0 && !isNaN(coins) && coins > 0) {
+                    calculateSummary(entryPrice, coins);
+                } else {
+                    calculateSummary();
+                }
+            };
+            entryPriceInput.addEventListener('input', handleInputChange);
+            coinsInput.addEventListener('input', handleInputChange);
+
+            // Scroll to change value
+            const handleWheel = (e) => {
+                e.preventDefault();
+                const input = e.target;
+                const currentValue = parseFloat(input.value) || 0;
+                const step = parseFloat(input.step);
+                let newValue = currentValue;
+
+                if (e.deltaY < 0) { // Scroll up
+                    newValue += step;
+                } else if (e.deltaY > 0) { // Scroll down
+                    newValue -= step;
+                }
+                
+                if (newValue < 0) newValue = 0;
+
+                // Determine decimal places from step attribute
+                const decimals = input.step.split('.')[1]?.length || 0;
+                input.value = newValue.toFixed(decimals);
+                input.dispatchEvent(new Event('input'));
+            };
+
+            entryPriceInput.addEventListener('wheel', handleWheel);
+            coinsInput.addEventListener('wheel', handleWheel);
+            exitPriceInput.addEventListener('wheel', handleWheel);
+            
             exitPriceInput.addEventListener('input', calculatePnL);
         };
     </script>
